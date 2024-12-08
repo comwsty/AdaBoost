@@ -1,0 +1,30 @@
+import tensorflow as tf
+from tensorflow.keras import layers, models
+from tensorflow.keras.datasets import imdb
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+# Загружаем и подготавливаем данные
+max_features = 10000
+maxlen = 200
+
+(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=max_features)
+x_train = pad_sequences(x_train, maxlen=maxlen)
+x_test = pad_sequences(x_test, maxlen=maxlen)
+
+# Создаем модель RNN
+model = models.Sequential([
+    layers.Embedding(input_dim=max_features, output_dim=128, input_length=maxlen),
+    layers.SimpleRNN(128, activation='relu'),
+    layers.Dense(1, activation='sigmoid')
+])
+
+# Компиляция модели
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+# Обучение модели
+model.fit(x_train, y_train, epochs=5, batch_size=64)
+
+# Оценка модели
+model.evaluate(x_test, y_test)
