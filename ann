@@ -1,0 +1,35 @@
+import tensorflow as tf
+from tensorflow.keras import layers, models
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+# Загружаем и подготавливаем данные
+iris = load_iris()
+X = iris.data
+y = iris.target
+
+# Преобразуем метки в категориальные
+encoder = LabelEncoder()
+y = encoder.fit_transform(y)
+
+# Разделяем данные на обучающие и тестовые
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+# Создаем модель ANN
+model = models.Sequential([
+    layers.Dense(64, activation='relu', input_shape=(X_train.shape[1],)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(3, activation='softmax')  # 3 класса
+])
+
+# Компиляция модели
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Обучение модели
+model.fit(X_train, y_train, epochs=10)
+
+# Оценка модели
+model.evaluate(X_test, y_test)
